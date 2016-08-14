@@ -11,8 +11,10 @@
         $imap = new imap('{imap.mujserver.cz}', 'muj@email.cz', 'mojeHesloKEmailu');
         $messages = $imap->emailsToParse();
         foreach(array_reverse($messages) as $message){
-            $message = bank::csob($message['message']);
-            //zde by pak bylo na miste ulozit data do db
+            if($message['header'] == 'ČSOB Info 24 - Avízo'){
+                $message = bank::csob($message['message']);
+                //zde by pak bylo na miste ulozit data do db
+            }
         }
         ?>
     </body>
