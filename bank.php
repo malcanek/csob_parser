@@ -63,7 +63,7 @@ class bank {
         $ret['date'] = $match[1];
         preg_match("'částka (.*?)[\n\t]'si", $message, $match);
         $ret['sum'] = $match[1];
-        preg_match("'na účtu (.*?)zaúčtována'si", $message, $match);
+        preg_match("'z účtu (.*?)[\n\t]'si", $message, $match);
         $ret['fromAccount'] = $match[1];
         preg_match("'KS (.*?)[\n\t]'si", $message, $match);
         $ret['ks'] = $match[1];
