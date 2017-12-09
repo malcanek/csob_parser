@@ -40,9 +40,12 @@ class imap {
     
     public function emailsToParse(){
         $imap = $this->imapOpen();
-        $numMessages = imap_num_msg($imap);
-        $unreaded = imap_status($imap, $this->server, SA_UNSEEN);
-        for($i = $numMessages; $i > ($numMessages - $unreaded->unseen); $i--){
+        $messages = imap_search($imap, 'UNSEEN');
+        if (!$messages) {
+            return array();
+        }
+
+        foreach ($messages as $i) {
             imap_setflag_full($imap, $i, "\\Seen", ST_UID);
             $uid = imap_uid($imap, $i);
             $header = imap_header($imap, $i);
