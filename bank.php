@@ -30,7 +30,7 @@ class bank {
         $ret['rest'] = $match[1];
         preg_match("'Místo:(.*?)[\n\t]'si", $message, $match);
         $ret['place'] = $match[1];
-        preg_match("'zpráva:(.*?)[\n\t]'si", $message, $match);
+        preg_match("'zpráva pro příjemce:[\n\t](.*?)[\n\t]'si", $message, $match);
         $ret['message'] = $match[1];
         if(empty($ret['message'])){
             preg_match("'zpráva pro příjemce:(.*?)[\n\t]'si", $message, $match);
@@ -40,10 +40,11 @@ class bank {
     }
     
     public static function getMessages($text){
+        $count = substr_count($text, 'Zůstatek na účtu po zaúčtování transakce');
         $parsed = explode("\n\n\n", $text);
         array_shift($parsed);
         unset($parsed[count($parsed) - 1]);
-        if(count($parsed) == 1){
+        if($count == 1){
             return [self::csob($text)];
         } else {
             return self::parseFromMultiple($parsed);
@@ -53,7 +54,10 @@ class bank {
     public static function parseFromMultiple($parsed){
         $ret = array();
         foreach($parsed as $p){
-            $ret[] = self::csobMultiple($p);
+            $data = self::csobMultiple($p);
+            if(!empty($data['date'])){
+                $ret[] = $data;
+            }
         }
         return $ret;
     }
@@ -63,7 +67,7 @@ class bank {
         $ret['date'] = $match[1];
         preg_match("'částka (.*?)[\n\t]'si", $message, $match);
         $ret['sum'] = $match[1];
-        preg_match("'z účtu (.*?)[\n\t]'si", $message, $match);
+        preg_match("'na účtu (.*?)zaúčtována'si", $message, $match);
         $ret['fromAccount'] = $match[1];
         preg_match("'KS (.*?)[\n\t]'si", $message, $match);
         $ret['ks'] = $match[1];
